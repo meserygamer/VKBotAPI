@@ -31,6 +31,16 @@ namespace CallBackVKAPI.Controllers
                 case "confirmation":
                     // Отправляем строку для подтверждения 
                     return Ok(_configuration["Config:Confirmation"]);
+                case "TEST":
+                    {
+                        _vkApi.Messages.Send(new MessagesSendParams()
+                        {
+                            RandomId = new DateTime().Millisecond,
+                            PeerId = 474771569,
+                            Message = "Если ты это видишь, то всё ок!"
+                        });
+                        break;
+                    }
             }
             // Возвращаем "ok" серверу Callback API
             return Ok("ok");
