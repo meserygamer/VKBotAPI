@@ -10,16 +10,15 @@ namespace CallBackVKAPI.Controllers
     [Route("")]
     public class CallBackController : Controller
     {
-        private readonly IConfiguration _configuration = Program.app.Configuration;
-
-        private readonly IVkApi _vkApi = new VkApi();
-
-        public CallBackController()
+        public CallBackController(IConfiguration configuration, IVkApi vkApi)
         {
+            _configuration = configuration;
+            _vkApi = vkApi;
             var ApiAuth = new ApiAuthParams();
             ApiAuth.AccessToken = _configuration["Config:AccessToken"];
             _vkApi.Authorize(ApiAuth);
         }
+
 
         [HttpPost]
         public IActionResult Callback([FromBody] Updates updates)
@@ -31,19 +30,18 @@ namespace CallBackVKAPI.Controllers
                 case "confirmation":
                     // Отправляем строку для подтверждения 
                     return Ok(_configuration["Config:Confirmation"]);
-                case "TEST":
+                case "message_new":
                     {
-                        _vkApi.Messages.Send(new MessagesSendParams()
-                        {
-                            RandomId = new DateTime().Millisecond,
-                            PeerId = 474771569,
-                            Message = "Если ты это видишь, то всё ок!"
-                        });
                         break;
                     }
             }
             // Возвращаем "ok" серверу Callback API
             return Ok("ok");
         }
+
+
+        private readonly IConfiguration _configuration;
+
+        private readonly IVkApi _vkApi;
     }
 }

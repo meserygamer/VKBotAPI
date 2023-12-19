@@ -10,8 +10,6 @@ namespace CallBackVKAPI
 {
     public class Program
     {
-        public static WebApplication app;
-
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -38,9 +36,9 @@ namespace CallBackVKAPI
                 });
                 option.DocInclusionPredicate((name, api) => true);
             });
+            builder.Services.AddSingleton<IVkApi, VkApi>();
 
-
-            app = builder.Build();
+            var app = builder.Build();
 
             app.UseCors(builder => builder.AllowAnyOrigin());
 
