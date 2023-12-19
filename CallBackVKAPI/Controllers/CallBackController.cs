@@ -1,4 +1,5 @@
-﻿using CallBackVKAPI.Models;
+﻿using CallBackVKAPI.Controllers.CallbackReactions;
+using CallBackVKAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using VkNet;
 using VkNet.Abstractions;
@@ -21,22 +22,12 @@ namespace CallBackVKAPI.Controllers
 
 
         [HttpPost]
-        public IActionResult Callback([FromBody] Updates updates)
+        public IActionResult CallbackAsync([FromBody] Updates updates)
         {
-            // Проверяем, что находится в поле "type" 
-            switch (updates.Type)
-            {
-                // Если это уведомление для подтверждения адреса
-                case "confirmation":
-                    // Отправляем строку для подтверждения 
-                    return Ok(_configuration["Config:Confirmation"]);
-                case "message_new":
-                    {
-                        break;
-                    }
-            }
-            // Возвращаем "ok" серверу Callback API
-            return Ok("ok");
+            CallbackReactionManager reactionManager = new (updates, _configuration); //Создание менеджера реакций
+            ICallBackReaction reaction = reactionManager.GetReactionOnUpdate(); //Получение соответсвующей событию реакции
+            Task.Run(() => reaction.StartReactionAsync()); //Запуск реакции на update в другом потоке
+            return reaction.GetResult(); //Оповещение ВК API о получении обновления
         }
 
 
