@@ -1,6 +1,7 @@
 ﻿using CallBackVKAPI.Controllers.CallbackReactions;
 using CallBackVKAPI.Controllers.CallBackReactionsFactories;
 using CallBackVKAPI.Models;
+using VkNet.Abstractions;
 
 namespace CallBackVKAPI.Controllers
 {
@@ -9,10 +10,11 @@ namespace CallBackVKAPI.Controllers
     /// </summary>
     public class CallbackReactionManager
     {
-        public CallbackReactionManager(Updates updateFromVK, IConfiguration configuration) 
+        public CallbackReactionManager(Updates updateFromVK, IConfiguration configuration, IVkApi vkApi) 
         {
             UpdateFromVK = updateFromVK;
             Configuration = configuration;
+            VkApi = vkApi;
         }
 
 
@@ -21,7 +23,15 @@ namespace CallBackVKAPI.Controllers
         /// </summary>
         public Updates UpdateFromVK { get; private init; }
 
+        /// <summary>
+        /// Конфигурация приложения
+        /// </summary>
         public IConfiguration Configuration { get; private init; }
+
+        /// <summary>
+        /// Экземпляр VK API
+        /// </summary>
+        public IVkApi VkApi { get; private init; }
 
 
         /// <summary>
@@ -42,6 +52,10 @@ namespace CallBackVKAPI.Controllers
                     {
                         ResultMessage = Configuration["Config:Confirmation"]
                     }).CreateCallbackReaction();
+
+                case "message_new":
+                    return new NewMessageCallbackReactionFactory(VkApi, UpdateFromVK).CreateCallbackReaction();
+
                 default:
                     return new FailedQueryCallbackReactionFactory().CreateCallbackReaction();
             }

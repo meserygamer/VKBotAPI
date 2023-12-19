@@ -24,7 +24,7 @@ namespace CallBackVKAPI.Controllers
         [HttpPost]
         public IActionResult CallbackAsync([FromBody] Updates updates)
         {
-            CallbackReactionManager reactionManager = new (updates, _configuration); //Создание менеджера реакций
+            CallbackReactionManager reactionManager = new (updates, _configuration, _vkApi); //Создание менеджера реакций
             ICallBackReaction reaction = reactionManager.GetReactionOnUpdate(); //Получение соответсвующей событию реакции
             Task.Run(() => reaction.StartReactionAsync()); //Запуск реакции на update в другом потоке
             return reaction.GetResult(); //Оповещение ВК API о получении обновления
