@@ -17,7 +17,6 @@ namespace CallBackVKAPI.Controllers.ButtonsBuilders
             };
             return this;
         }
-
         public IButtonBuilder SetColor()
         {
             _button.Color = VkNet.Enums.StringEnums.KeyboardButtonColor.Default;
