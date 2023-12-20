@@ -1,4 +1,5 @@
 ﻿using CallBackVKAPI.Controllers.BotCommands;
+using CallBackVKAPI.Controllers.MessageParamsBuilders;
 using VkNet.Abstractions;
 using VkNet.Model;
 
@@ -27,7 +28,11 @@ namespace CallBackVKAPI.Controllers.BotCommandsFactories
                 throw new ArgumentNullException("ID отправителя отсутствует");
             }
 
-            return new ShowMenuBotCommand(_vkApi, (long)_message.FromId);
+            return new ShowMenuBotCommand(_vkApi
+                , new ShowMainMenuMessageParamsBuilder((long)_message.FromId)
+                    .AddContent()
+                    .AddKeyboard()
+                    .Build());
         }
 
         /// <summary>
