@@ -5,6 +5,7 @@ using VkNet.Abstractions;
 using VkNet.Enums.StringEnums;
 using VkNet.Model;
 using VkNet;
+using CallBackVKAPI.Models.DataBase;
 
 namespace CallBackVKAPI
 {
@@ -50,6 +51,17 @@ namespace CallBackVKAPI
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                 options.RoutePrefix = string.Empty;
             });
+
+            using (DataBaseContext db = new DataBaseContext())
+            {
+                db.BotUsers.Add(new BotUser() 
+                {
+                    VkId = 474771569,
+                    IsAdmin = true,
+                    IsSubscriber = true,
+                });
+                db.SaveChanges();
+            }
 
             app.Run();
         }
