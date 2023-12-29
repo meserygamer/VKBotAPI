@@ -52,16 +52,16 @@ namespace CallBackVKAPI
                 options.RoutePrefix = string.Empty;
             });
 
-            using (DataBaseContext db = new DataBaseContext())
-            {
-                db.BotUsers.Add(new BotUser() 
-                {
-                    VkId = 474771569,
-                    IsAdmin = true,
-                    IsSubscriber = true,
-                });
-                db.SaveChanges();
-            }
+            //using (DataBaseContext db = new DataBaseContext())
+            //{
+            //    db.BotUsers.Add(new BotUser() 
+            //    {
+            //        VkId = 474771569,
+            //        IsAdmin = true,
+            //        IsSubscriber = true,
+            //    });
+            //    db.SaveChanges();
+            //}
 
             app.Run();
         }
