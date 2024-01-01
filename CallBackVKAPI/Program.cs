@@ -6,6 +6,7 @@ using VkNet.Enums.StringEnums;
 using VkNet.Model;
 using VkNet;
 using CallBackVKAPI.Models.DataBase;
+using CallBackVKAPI.Logger;
 
 namespace CallBackVKAPI
 {
@@ -38,6 +39,7 @@ namespace CallBackVKAPI
                 option.DocInclusionPredicate((name, api) => true);
             });
             builder.Services.AddSingleton<IVkApi, VkApi>();
+            builder.Services.AddScoped<IFileLogger, FileLogger>();
 
             var app = builder.Build();
 

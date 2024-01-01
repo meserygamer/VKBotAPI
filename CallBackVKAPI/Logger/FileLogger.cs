@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Text;
 using System.Text.Json.Nodes;
 
 namespace CallBackVKAPI.Logger
 {
-    public class FileLogger : ILogger, IDisposable
+    public class FileLogger : IFileLogger, IDisposable
     {
         /// <summary>
         /// При использовании данного конструктора необходимо передать имя файла с логами собственноручно
@@ -12,28 +13,29 @@ namespace CallBackVKAPI.Logger
         public FileLogger() { }
 
 
+        #region Реализация IFileLogger
         /// <summary>
         /// Название файла логов
         /// </summary>
-        public string? LogFileName { get; init; }
+        public string? LogFileName { get; set; }
 
 
+        /// <summary>
+        /// Запись строки в логи
+        /// </summary>
+        /// <param name="StringToWrite">Строка для записи</param>
+        /// <param name="logLevel">Уровень логирования</param>
         public void WriteStringToLog(string StringToWrite
                                     ,LogLevel logLevel = LogLevel.Information)
         {
-            Log<String>(logLevel
-                       ,0 
-                       ,StringToWrite 
-                       ,null 
-                       ,(str, exp) => str);
+            Task.Run(() => Log<String>(logLevel
+                       , 0
+                       , StringToWrite
+                       , null
+                       , (str, exp) => "[" + logLevel.ToString() + "] " + str));
+            
         }
-
-        public void WriteJSONToLog(JsonObject jsonObjectToWrite
-                                  ,LogLevel logLevel = LogLevel.Information)
-        {
-
-        }
-
+        #endregion
 
         #region Реализация ILogger
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => this;
@@ -58,9 +60,9 @@ namespace CallBackVKAPI.Logger
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled(logLevel)) return;
-            CreateLogFileIfDoesNotExist();
             lock(_lockerDummy)
             {
+                CreateLogFileIfDoesNotExist();
                 WriteLineToLogFile(formatter(state, exception));
             }
         }
@@ -89,8 +91,8 @@ namespace CallBackVKAPI.Logger
         {
             if (_logFile is not null) return;
             if (LogFileName is null) throw new ArgumentNullException(nameof(LogFileName));
-            _logFile = new FileInfo(LogFileName);
-            _logFile.Create();
+            _logFile = new FileInfo(LogFileName + ".log");
+            (_logFile.Create()).Close();
         }
 
         /// <summary>
