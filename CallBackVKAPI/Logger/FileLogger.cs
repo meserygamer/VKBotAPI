@@ -27,12 +27,11 @@ namespace CallBackVKAPI.Logger
         /// <param name="logLevel">Уровень логирования</param>
         public void WriteStringToLog(string StringToWrite
                                     ,LogLevel logLevel = LogLevel.Information)
-        {
-            Task.Run(() => Log<String>(logLevel
+        {              Log<String>(logLevel
                        , 0
                        , StringToWrite
                        , null
-                       , (str, exp) => "[" + logLevel.ToString() + "] " + str));
+                       , (str, exp) => "[" + logLevel.ToString() + "] " + str);
             
         }
         #endregion

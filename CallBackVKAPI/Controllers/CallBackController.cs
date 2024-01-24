@@ -28,7 +28,7 @@ namespace CallBackVKAPI.Controllers
         {
             AuthorizeInVkApi(); //Авторизация в vkApi
             _callBackControllerLogger.LogQuarryObjectIntoFile(updates); //Логгирование объекта запроса в файл
-            CallbackReactionManager reactionManager = new (updates, _configuration, _vkApi); //Создание менеджера реакций
+            CallbackReactionManager reactionManager = new (updates, _configuration, _vkApi, _fileLogger); //Создание менеджера реакций
             ICallBackReaction reaction = reactionManager.GetReactionOnUpdate(); //Получение соответсвующей событию реакции
             Task.Run(() => reaction.StartReactionAsync()); //Запуск реакции на update в другом потоке
             return reaction.GetResult(); //Оповещение ВК API о получении обновления
@@ -77,7 +77,7 @@ namespace CallBackVKAPI.Controllers
         /// <param name="updates">Объект запроса</param>
         public void LogQuarryObjectIntoFile(Updates updates)
         {
-            if (!isFileNameSet)
+            if (!_logger.IsFileNameSet)
             {
                 SetLoggerFileName(updates);
             }
@@ -100,11 +100,5 @@ namespace CallBackVKAPI.Controllers
         /// Реализация сервиса по логгированию в файл
         /// </summary>
         private readonly IFileLogger _logger;
-
-
-        /// <summary>
-        /// Своство для проверки задания имени файла
-        /// </summary>
-        private bool isFileNameSet => _logger.LogFileName != null;
     }
 }
