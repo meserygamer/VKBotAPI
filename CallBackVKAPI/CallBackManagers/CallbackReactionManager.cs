@@ -1,5 +1,6 @@
 ﻿using CallBackVKAPI.Controllers.CallbackReactions;
 using CallBackVKAPI.Controllers.CallBackReactionsFactories;
+using CallBackVKAPI.Logger;
 using CallBackVKAPI.Models;
 using VkNet.Abstractions;
 
@@ -10,11 +11,12 @@ namespace CallBackVKAPI.Controllers
     /// </summary>
     public class CallbackReactionManager
     {
-        public CallbackReactionManager(Updates updateFromVK, IConfiguration configuration, IVkApi vkApi) 
+        public CallbackReactionManager(Updates updateFromVK, IConfiguration configuration, IVkApi vkApi, IFileLogger logger) 
         {
             UpdateFromVK = updateFromVK;
             Configuration = configuration;
             VkApi = vkApi;
+            Logger = logger;
         }
 
 
@@ -32,6 +34,11 @@ namespace CallBackVKAPI.Controllers
         /// Экземпляр VK API
         /// </summary>
         public IVkApi VkApi { get; private init; }
+
+        /// <summary>
+        /// Используемый файловый логгер
+        /// </summary>
+        public IFileLogger Logger { get; private init; }
 
 
         /// <summary>

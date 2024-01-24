@@ -19,16 +19,15 @@ namespace CallBackVKAPI.Controllers
             _configuration = configuration;
             _vkApi = vkApi;
             _fileLogger = fileLogger;
+            _callBackControllerLogger = new (fileLogger);
         }
 
 
         [HttpPost]
         public IActionResult CallbackAsync([FromBody] Updates updates)
         {
-            SetLoggerFileName(updates); //Задание имени файлу с логами
             AuthorizeInVkApi(); //Авторизация в vkApi
-            _fileLogger.WriteStringToLog("Hello It's my logger!");
-            _fileLogger.WriteStringToLog(JsonSerializer.Serialize<Updates>(updates));
+            _callBackControllerLogger.LogQuarryObjectIntoFile(updates); //Логгирование объекта запроса в файл
             CallbackReactionManager reactionManager = new (updates, _configuration, _vkApi); //Создание менеджера реакций
             ICallBackReaction reaction = reactionManager.GetReactionOnUpdate(); //Получение соответсвующей событию реакции
             Task.Run(() => reaction.StartReactionAsync()); //Запуск реакции на update в другом потоке
@@ -46,16 +45,66 @@ namespace CallBackVKAPI.Controllers
             _vkApi.Authorize(ApiAuth);
         }
 
-        private void SetLoggerFileName(Updates quarryForLogging)
-        {
-            _fileLogger.LogFileName = quarryForLogging.Type + "__" + DateTime.Now.ToString("\'date\'dd.mm.yyyy\'time\'H.mm") + "__" + quarryForLogging.EventId;
-        }
-
 
         private readonly IConfiguration _configuration;
 
         private readonly IVkApi _vkApi;
 
         private readonly IFileLogger _fileLogger;
+
+        private readonly CallBackControllerLogger _callBackControllerLogger;
+    }
+
+
+    /// <summary>
+    /// Класс инкапсулирующий логику для логгирования CallBack контроллера
+    /// </summary>
+    public class CallBackControllerLogger
+    {
+        /// <summary>
+        /// Основной конструктор
+        /// </summary>
+        /// <param name="logger">Реализация сервиса по логгированию в файл</param>
+        public CallBackControllerLogger(IFileLogger logger)
+        {
+            _logger = logger;
+        }
+
+
+        /// <summary>
+        /// Метод логгирования пришедшего запроса
+        /// </summary>
+        /// <param name="updates">Объект запроса</param>
+        public void LogQuarryObjectIntoFile(Updates updates)
+        {
+            if (!isFileNameSet)
+            {
+                SetLoggerFileName(updates);
+            }
+            _logger.WriteStringToLog("Пришедший запрос:");
+            _logger.WriteStringToLog(JsonSerializer.Serialize<Updates>(updates));
+        }
+
+
+        /// <summary>
+        /// Установка имени для фала логов в соотвествии с содержанием пришедшего запроса
+        /// </summary>
+        /// <param name="quarryForLogging">Объект пришедшего запроса</param>
+        private void SetLoggerFileName(Updates quarryForLogging)
+        {
+            _logger.LogFileName = quarryForLogging.Type + "__" + DateTime.Now.ToString("\'date\'dd.mm.yyyy\'time\'H.mm") + "__" + quarryForLogging.EventId;
+        }
+
+
+        /// <summary>
+        /// Реализация сервиса по логгированию в файл
+        /// </summary>
+        private readonly IFileLogger _logger;
+
+
+        /// <summary>
+        /// Своство для проверки задания имени файла
+        /// </summary>
+        private bool isFileNameSet => _logger.LogFileName != null;
     }
 }
