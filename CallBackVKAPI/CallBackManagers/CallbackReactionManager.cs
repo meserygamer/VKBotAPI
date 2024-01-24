@@ -68,7 +68,7 @@ namespace CallBackVKAPI.Controllers
 
                 case "message_new":
                     _reactionManagerLogger.LogMessageNewSucceed(); //Логгирование создания фабрики
-                    return new NewMessageCallbackReactionFactory(VkApi, UpdateFromVK).CreateCallbackReaction();
+                    return new NewMessageCallbackReactionFactory(VkApi, UpdateFromVK, Logger).CreateCallbackReaction();
 
                 default:
                     _reactionManagerLogger.LogFailedQuarryType(); //Логгирование ошибки выбора реакции
