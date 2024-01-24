@@ -30,7 +30,7 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
         {
             _confirmationCallBackReactionFactoryLogger.LogInfoAboutCreatingCallbackReaction(); 
             //Логгирование информации о начале создания реакции
-            return new ConfirmationCallbackReaction(ResultMessage);
+            return new ConfirmationCallbackReaction(ResultMessage, _fileLogger);
         }
 
 
@@ -46,6 +46,9 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
     }
 
 
+    /// <summary>
+    /// Класс инкапсулирующий в себе логику логгирования фабрики создания реакции подтверждения
+    /// </summary>
     public class ConfirmationCallBackReactionFactoryLogger
     {
         /// <summary>

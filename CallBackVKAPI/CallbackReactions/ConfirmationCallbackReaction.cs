@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CallBackVKAPI.Logger;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CallBackVKAPI.Controllers.CallbackReactions
 {
@@ -7,9 +8,11 @@ namespace CallBackVKAPI.Controllers.CallbackReactions
     /// </summary>
     public class ConfirmationCallbackReaction : CallbackReactionBase
     {
-        public ConfirmationCallbackReaction(string confirmingMessage)
+        public ConfirmationCallbackReaction(string confirmingMessage, IFileLogger logger)
         {
             ConfirmingMessage = confirmingMessage;
+            _confirmationCallbackReactionLogger = new ConfirmationCallbackReactionLogger(logger);
+            _confirmationCallbackReactionLogger.LogInfoAboutCreatingObject();
         }
 
 
@@ -35,5 +38,32 @@ namespace CallBackVKAPI.Controllers.CallbackReactions
         /// Сообщение для подтвержения сервера
         /// </summary>
         public string ConfirmingMessage { get; private set; } = "";
+
+
+        private ConfirmationCallbackReactionLogger _confirmationCallbackReactionLogger;
+    }
+
+
+    public class ConfirmationCallbackReactionLogger
+    {
+        public ConfirmationCallbackReactionLogger(IFileLogger logger)
+        {
+            _logger = logger;
+        }
+
+
+        /// <summary>
+        /// Метод логгирования информации о создании нового объекта
+        /// </summary>
+        public void LogInfoAboutCreatingObject()
+        {
+            _logger.WriteStringToLog("Создан объект реакции подтверждения", LogLevel.Debug);
+        }
+
+
+        /// <summary>
+        /// Используемый файловый логгер
+        /// </summary>
+        private IFileLogger _logger;
     }
 }
