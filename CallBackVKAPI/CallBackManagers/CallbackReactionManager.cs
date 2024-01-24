@@ -61,7 +61,7 @@ namespace CallBackVKAPI.Controllers
                         throw new ArgumentNullException("Config:Confirmation - noncontains");
                     }
                     _reactionManagerLogger.LogConfirmationSucceed(); //Логгирование создания фабрики
-                    return (new ConfirmationCallBackReactionFactory() 
+                    return (new ConfirmationCallBackReactionFactory(Logger) 
                     {
                         ResultMessage = Configuration["Config:Confirmation"]
                     }).CreateCallbackReaction();
@@ -127,7 +127,7 @@ namespace CallBackVKAPI.Controllers
         /// </summary>
         public void LogConfirmationSucceed()
         {
-            _logger.WriteStringToLog("Создана фабрика реакции подтверждения, запрошена реакция подтверждения", LogLevel.Debug);
+            _logger.WriteStringToLog("Запрошена реакция подтверждения", LogLevel.Debug);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace CallBackVKAPI.Controllers
         /// </summary>
         public void LogMessageNewSucceed()
         {
-            _logger.WriteStringToLog("Создана фабрика реакции новое сообщение, запрошена реакция", LogLevel.Debug);
+            _logger.WriteStringToLog("Запрошена реакция на новое сообщение", LogLevel.Debug);
         }
 
         public void LogFailedQuarryType()
