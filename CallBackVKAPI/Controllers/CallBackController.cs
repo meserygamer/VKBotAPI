@@ -30,7 +30,9 @@ namespace CallBackVKAPI.Controllers
             _callBackControllerLogger.LogQuarryObjectIntoFile(updates); //Логгирование объекта запроса в файл
             CallbackReactionManager reactionManager = new (updates, _configuration, _vkApi, _fileLogger); //Создание менеджера реакций
             ICallBackReaction reaction = reactionManager.GetReactionOnUpdate(); //Получение соответсвующей событию реакции
+            _callBackControllerLogger.LogStartReaction(); //Логгирование начала реакции на запрос
             Task.Run(() => reaction.StartReactionAsync()); //Запуск реакции на update в другом потоке
+            _callBackControllerLogger.LogConfirmationOfReceipt(reaction.GetResult()); //Логгирование подтверждения ВК получения запроса
             return reaction.GetResult(); //Оповещение ВК API о получении обновления
         }
 
@@ -83,6 +85,22 @@ namespace CallBackVKAPI.Controllers
             }
             _logger.WriteStringToLog("Пришедший запрос:");
             _logger.WriteStringToLog(JsonSerializer.Serialize<Updates>(updates));
+        }
+
+        /// <summary>
+        /// Метод логгирования старта реакции на запрос
+        /// </summary>
+        public void LogStartReaction()
+        {
+            _logger.WriteStringToLog("Начало реакции на поступивший запрос");
+        }
+
+        /// <summary>
+        /// Метод логгирования подтверждения получения запроса
+        /// </summary>
+        public void LogConfirmationOfReceipt(IActionResult result)
+        {
+            _logger.WriteStringToLog("Отправка ответа ВК о получении запроса, result - " + result.ToString());
         }
 
 
