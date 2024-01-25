@@ -52,7 +52,7 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
         {
             _newMessageCallbackReactionFactoryLogger.LogInfoAboutCreatingCallbackReactionCommand(); 
             //Логгирование создания комманды для реакции
-            return new BotCommandManager(_vkApi, _messageFromUser).GetBotCommand();
+            return new BotCommandManager(_vkApi, _messageFromUser, _logger).GetBotCommand();
         }
 
 
