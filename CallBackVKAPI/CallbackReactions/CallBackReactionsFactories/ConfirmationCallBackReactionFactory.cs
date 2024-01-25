@@ -1,5 +1,7 @@
 ﻿using CallBackVKAPI.Controllers.CallbackReactions;
 using CallBackVKAPI.Logger;
+using CallBackVKAPI.Logger.CallBackReactionFactoriesLoggers;
+using CallBackVKAPI.Logger.ManagersLoggers;
 
 namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
 {
@@ -10,9 +12,8 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
     {
         public ConfirmationCallBackReactionFactory(IFileLogger fileLogger)
         {
-            _fileLogger = fileLogger;
-            _confirmationCallBackReactionFactoryLogger = new ConfirmationCallBackReactionFactoryLogger(_fileLogger);
-            _confirmationCallBackReactionFactoryLogger.LogInfoAboutCreatingObject(); //Логгирование создания объекта
+            Logger = new ConfirmationCallBackReactionFactoryLogger(fileLogger); //Создание логгера
+            Logger.LogObjectCreation(typeof(ConfirmationCallBackReactionFactory)); //Логгирование создания объекта
         }
 
 
@@ -21,6 +22,11 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
         /// </summary>
         public string ResultMessage {get; set;} = string.Empty;
 
+        /// <summary>
+        /// Логгер для данного класса
+        /// </summary>
+        public ConfirmationCallBackReactionFactoryLogger Logger { get; private set; }
+
 
         /// <summary>
         /// Создаёт экземпляр реакции на callback
@@ -28,59 +34,9 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
         /// <returns>Новый объект типа ConfirmationCallbackReaction упакованный в ICallBackReaction</returns>
         public ICallBackReaction CreateCallbackReaction()
         {
-            _confirmationCallBackReactionFactoryLogger.LogInfoAboutCreatingCallbackReaction(); 
+            Logger.LogReactionCreating(typeof(ConfirmationCallbackReaction));
             //Логгирование информации о начале создания реакции
-            return new ConfirmationCallbackReaction(ResultMessage, _fileLogger);
+            return new ConfirmationCallbackReaction(ResultMessage, Logger.FileLogger);
         }
-
-
-        /// <summary>
-        /// Используемый логгер
-        /// </summary>
-        private IFileLogger _fileLogger;
-
-        /// <summary>
-        /// Класс инкапсулирующий логику логгирования фабрики реакции подтверждения
-        /// </summary>
-        private ConfirmationCallBackReactionFactoryLogger _confirmationCallBackReactionFactoryLogger;
-    }
-
-
-    /// <summary>
-    /// Класс инкапсулирующий в себе логику логгирования фабрики создания реакции подтверждения
-    /// </summary>
-    public class ConfirmationCallBackReactionFactoryLogger
-    {
-        /// <summary>
-        /// Основной конструктор логгера для фабрики реакции подтверждения
-        /// </summary>
-        /// <param name="logger">Используемый файловый логгер</param>
-        public ConfirmationCallBackReactionFactoryLogger(IFileLogger logger)
-        {
-            _logger = logger;
-        }
-
-
-        /// <summary>
-        /// Метод логгирования информации о создании нового объекта
-        /// </summary>
-        public void LogInfoAboutCreatingObject()
-        {
-            _logger.WriteStringToLog("Создан объект фабрики реакции подтверждения", LogLevel.Debug);
-        }
-
-        /// <summary>
-        /// Метод логгирования информации о начале создания реакции
-        /// </summary>
-        public void LogInfoAboutCreatingCallbackReaction()
-        {
-            _logger.WriteStringToLog("Фабрика создаёт реакцию подтверждения", LogLevel.Debug);
-        }
-
-
-        /// <summary>
-        /// Используемый файловый логгер
-        /// </summary>
-        private IFileLogger _logger;
     }
 }
