@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Text;
 using System.Text.Json.Nodes;
 
@@ -59,11 +58,8 @@ namespace CallBackVKAPI.Logger
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled(logLevel)) return;
-            lock(_lockerDummy)
-            {
-                CreateLogFileIfDoesNotExist();
-                WriteLineToLogFile(formatter(state, exception));
-            }
+            CreateLogFileIfDoesNotExist();
+            WriteLineToLogFile(formatter(state, exception));
         }
         #endregion
 
@@ -76,11 +72,6 @@ namespace CallBackVKAPI.Logger
         /// Файл для хранения логов запроса
         /// </summary>
         private FileInfo? _logFile = null;
-
-        /// <summary>
-        /// Заглушка для синхронизации потоков при работе с файлом логов
-        /// </summary>
-        private object _lockerDummy = new object();
 
 
         /// <summary>
