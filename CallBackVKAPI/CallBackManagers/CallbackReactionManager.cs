@@ -58,7 +58,7 @@ namespace CallBackVKAPI.Controllers
                     if(Configuration["Config:Confirmation"] is null)
                     {
                         _reactionManagerLogger.LogConfirmationError(); //Логгирование ошибки
-                        throw new ArgumentNullException("Config:Confirmation - noncontains");
+                        throw new ArgumentNullException("Config:Confirmation", "Config:Confirmation - noncontains");
                     }
                     _reactionManagerLogger.LogConfirmationSucceed(); //Логгирование создания фабрики
                     return (new ConfirmationCallBackReactionFactory(Logger) 
