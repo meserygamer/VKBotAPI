@@ -5,6 +5,10 @@
     /// </summary>
     public abstract class ManagerLogger : ApiObjectLogger
     {
+        protected ManagerLogger(IFileLogger logger) : base(logger)
+        {
+        }
+
         /// <summary>
         /// Метод, логирующий получение, классом менеджером, запроса на объект
         /// </summary>

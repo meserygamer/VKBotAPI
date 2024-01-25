@@ -5,10 +5,16 @@
     /// </summary>
     public abstract class ApiObjectLogger
     {
+        protected ApiObjectLogger(IFileLogger logger)
+        {
+            FileLogger = logger;
+        }
+
+
         /// <summary>
         /// Свойство, хранящее используемый логгер
         /// </summary>
-        public IFileLogger FileLogger { get; }
+        public IFileLogger FileLogger { get; private init; }
 
 
         /// <summary>

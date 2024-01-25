@@ -18,8 +18,8 @@ namespace CallBackVKAPI.Controllers
             UpdateFromVK = updateFromVK;
             Configuration = configuration;
             VkApi = vkApi;
-            callBackReactionManagerLogger = new CallBackReactionManagerLogger(logger); //Создание логгера для класса
-            callBackReactionManagerLogger.LogObjectCreation(typeof(CallbackReactionManager)); //Логирование информации
+            Logger = new CallBackReactionManagerLogger(logger); //Создание логгера для класса
+            Logger.LogObjectCreation(typeof(CallbackReactionManager)); //Логирование информации
                                                                                               //о создании экземпляра класса
         }
 
@@ -42,7 +42,7 @@ namespace CallBackVKAPI.Controllers
         /// <summary>
         /// Логгер для данного класса
         /// </summary>
-        public CallBackReactionManagerLogger callBackReactionManagerLogger { get; private set; }
+        public CallBackReactionManagerLogger Logger { get; private set; }
 
 
         /// <summary>
@@ -52,32 +52,32 @@ namespace CallBackVKAPI.Controllers
         /// <exception cref="ArgumentNullException">Происходит, если в appsettings отсутствует аругемент Config:Confirmation</exception>
         public ICallBackReaction GetReactionOnUpdate()
         {
-            callBackReactionManagerLogger.LogQuarryOnManage(typeof(ICallBackReaction), UpdateFromVK.Type); //Логгирование
+            Logger.LogQuarryOnManage(typeof(ICallBackReaction), UpdateFromVK.Type); //Логгирование
                                                                                                            //пришедшего запроса
             switch (UpdateFromVK.Type)
             {
                 case "confirmation":
-                    callBackReactionManagerLogger.LogManagerChoice("confirmation"); //Логгирование выбора ветки подтверждения
+                    Logger.LogManagerChoice("confirmation"); //Логгирование выбора ветки подтверждения
                     if (Configuration["Config:Confirmation"] is null)
                     {
                         Exception exception = new ArgumentNullException("Config:Confirmation"
                             , "Config:Confirmation - noncontains"); //Создание ошибки
-                        callBackReactionManagerLogger.LogException(exception); //Логгирование ошибки
+                        Logger.LogException(exception); //Логгирование ошибки
                         throw exception;
                     }
-                    return (new ConfirmationCallBackReactionFactory(callBackReactionManagerLogger.FileLogger) 
+                    return (new ConfirmationCallBackReactionFactory(Logger.FileLogger) 
                     {
                         ResultMessage = Configuration["Config:Confirmation"]
                     }).CreateCallbackReaction();
 
                 case "message_new":
-                    callBackReactionManagerLogger.LogManagerChoice("message_new"); //Логгирование выбора ветки нового сообщения
+                    Logger.LogManagerChoice("message_new"); //Логгирование выбора ветки нового сообщения
                     return new NewMessageCallbackReactionFactory(VkApi
                         , UpdateFromVK
-                        , callBackReactionManagerLogger.FileLogger).CreateCallbackReaction();
+                        , Logger.FileLogger).CreateCallbackReaction();
 
                 default:
-                    callBackReactionManagerLogger.LogManagerChoice("default"); //Логгирование выбора ветки по умолчанию
+                    Logger.LogManagerChoice("default"); //Логгирование выбора ветки по умолчанию
                     return new FailedQueryCallbackReactionFactory().CreateCallbackReaction();
             }
         }

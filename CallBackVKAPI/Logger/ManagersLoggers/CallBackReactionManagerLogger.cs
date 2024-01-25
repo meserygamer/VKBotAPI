@@ -9,15 +9,6 @@
         /// Конструктор CallBackReactionManagerLogger
         /// </summary>
         /// <param name="logger">Используемый логгер</param>
-        public CallBackReactionManagerLogger(IFileLogger logger) : base()
-        {
-            FileLogger = logger;
-        }
-
-
-        /// <summary>
-        /// Используемый файловый логгер
-        /// </summary>
-        public IFileLogger FileLogger { get; private init;}
+        public CallBackReactionManagerLogger(IFileLogger logger) : base(logger) { }
     }
 }
