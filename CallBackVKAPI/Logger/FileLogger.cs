@@ -81,7 +81,7 @@ namespace CallBackVKAPI.Logger
         {
             if (_logFile is not null) return;
             if (LogFileName is null) throw new ArgumentNullException(nameof(LogFileName));
-            _logFile = new FileInfo(LogFileName + ".log");
+            _logFile = new FileInfo("Logs\\" + LogFileName + ".log");
             (_logFile.Create()).Close();
         }
 

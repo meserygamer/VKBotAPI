@@ -1,5 +1,7 @@
 ﻿using CallBackVKAPI.Controllers.CallbackReactions;
 using CallBackVKAPI.Logger;
+using CallBackVKAPI.Logger.ControllersLoggers;
+using CallBackVKAPI.Logger.ManagersLoggers;
 using CallBackVKAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -16,23 +18,39 @@ namespace CallBackVKAPI.Controllers
     {
         public CallBackController(IConfiguration configuration, IVkApi vkApi, IFileLogger fileLogger)
         {
-            _configuration = configuration;
-            _vkApi = vkApi;
-            _fileLogger = fileLogger;
-            _callBackControllerLogger = new (fileLogger);
+            Configuration = configuration;
+            VkApi = vkApi;
+            Logger = new (fileLogger);
+            Logger.LogObjectCreation(typeof(CallBackController));
         }
+
+
+        /// <summary>
+        /// Конфигурация приложения
+        /// </summary>
+        public IConfiguration Configuration { get; private init; }
+
+        /// <summary>
+        /// Экземпляр VK API
+        /// </summary>
+        public IVkApi VkApi { get; private init; }
+
+        /// <summary>
+        /// Логгер для данного класса
+        /// </summary>
+        public CallBackControllerLogger Logger { get; private set; }
 
 
         [HttpPost]
         public IActionResult CallbackAsync([FromBody] Updates updates)
         {
             AuthorizeInVkApi(); //Авторизация в vkApi
-            _callBackControllerLogger.LogQuarryObjectIntoFile(updates); //Логгирование объекта запроса в файл
-            CallbackReactionManager reactionManager = new (updates, _configuration, _vkApi, _fileLogger); //Создание менеджера реакций
+            Logger.LogQuarryObject(updates); //Логгирование объекта запроса в файл
+            CallbackReactionManager reactionManager = new (updates, Configuration, VkApi, Logger.FileLogger); //Создание менеджера реакций
             ICallBackReaction reaction = reactionManager.GetReactionOnUpdate(); //Получение соответсвующей событию реакции
-            _callBackControllerLogger.LogStartReaction(); //Логгирование начала реакции на запрос
+            Logger.LogStartReaction(); //Логгирование начала реакции на запрос
             Task.Run(() => reaction.StartReactionAsync()); //Запуск реакции на update в другом потоке
-            _callBackControllerLogger.LogConfirmationOfReceipt(reaction.GetResult()); //Логгирование подтверждения ВК получения запроса
+            Logger.LogResult(reaction.GetResult()); //Логгирование подтверждения ВК получения запроса
             return reaction.GetResult(); //Оповещение ВК API о получении обновления
         }
 
@@ -43,80 +61,8 @@ namespace CallBackVKAPI.Controllers
         private void AuthorizeInVkApi()
         {
             var ApiAuth = new ApiAuthParams();
-            ApiAuth.AccessToken = _configuration["Config:AccessToken"];
-            _vkApi.Authorize(ApiAuth);
+            ApiAuth.AccessToken = Configuration["Config:AccessToken"];
+            VkApi.Authorize(ApiAuth);
         }
-
-
-        private readonly IConfiguration _configuration;
-
-        private readonly IVkApi _vkApi;
-
-        private readonly IFileLogger _fileLogger;
-
-        private readonly CallBackControllerLogger _callBackControllerLogger;
-    }
-
-
-    /// <summary>
-    /// Класс инкапсулирующий логику для логгирования CallBack контроллера
-    /// </summary>
-    public class CallBackControllerLogger
-    {
-        /// <summary>
-        /// Основной конструктор
-        /// </summary>
-        /// <param name="logger">Реализация сервиса по логгированию в файл</param>
-        public CallBackControllerLogger(IFileLogger logger)
-        {
-            _logger = logger;
-        }
-
-
-        /// <summary>
-        /// Метод логгирования пришедшего запроса
-        /// </summary>
-        /// <param name="updates">Объект запроса</param>
-        public void LogQuarryObjectIntoFile(Updates updates)
-        {
-            if (!_logger.IsFileNameSet)
-            {
-                SetLoggerFileName(updates);
-            }
-            _logger.WriteStringToLog("Пришедший запрос:");
-            _logger.WriteStringToLog(JsonSerializer.Serialize<Updates>(updates));
-        }
-
-        /// <summary>
-        /// Метод логгирования старта реакции на запрос
-        /// </summary>
-        public void LogStartReaction()
-        {
-            _logger.WriteStringToLog("Начало реакции на поступивший запрос");
-        }
-
-        /// <summary>
-        /// Метод логгирования подтверждения получения запроса
-        /// </summary>
-        public void LogConfirmationOfReceipt(IActionResult result)
-        {
-            _logger.WriteStringToLog("Отправка ответа ВК о получении запроса, result - " + result.ToString());
-        }
-
-
-        /// <summary>
-        /// Установка имени для фала логов в соотвествии с содержанием пришедшего запроса
-        /// </summary>
-        /// <param name="quarryForLogging">Объект пришедшего запроса</param>
-        private void SetLoggerFileName(Updates quarryForLogging)
-        {
-            _logger.LogFileName = quarryForLogging.Type + "__" + DateTime.Now.ToString("\'date\'dd.mm.yyyy\'time\'H.mm") + "__" + quarryForLogging.EventId;
-        }
-
-
-        /// <summary>
-        /// Реализация сервиса по логгированию в файл
-        /// </summary>
-        private readonly IFileLogger _logger;
     }
 }
