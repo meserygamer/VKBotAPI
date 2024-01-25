@@ -1,18 +1,21 @@
 ﻿namespace CallBackVKAPI.Logger
 {
-    public interface IApiObjectLogger
+    /// <summary>
+    /// Абстрактный класс, инкапсулирующий общую логику логгирования для всех классов в программе
+    /// </summary>
+    public abstract class ApiObjectLogger
     {
         /// <summary>
         /// Свойство, хранящее используемый логгер
         /// </summary>
-        IFileLogger FileLogger { get; }
+        public IFileLogger FileLogger { get; }
 
 
         /// <summary>
         /// Метод, логгирующий факт создания объекта
         /// </summary>
         /// <param name="objectType">Тип созданного объекта</param>
-        virtual void LogObjectCreation(Type objectType) =>
+        public virtual void LogObjectCreation(Type objectType) =>
             FileLogger.WriteStringToLog("Создан объект - " + objectType.FullName
                                         , LogLevel.Debug);
 
@@ -20,7 +23,7 @@
         /// Метод, логгирующий факт возникновения ошибки
         /// </summary>
         /// <param name="exception"></param>
-        virtual void LogException(Exception exception) => 
+        public virtual void LogException(Exception exception) => 
             FileLogger.WriteStringToLog("В методе - + "
                                       + exception.TargetSite 
                                       + ", возникло исключение - " 

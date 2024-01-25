@@ -1,6 +1,7 @@
 ﻿using CallBackVKAPI.Controllers.CallbackReactions;
 using CallBackVKAPI.Controllers.CallBackReactionsFactories;
 using CallBackVKAPI.Logger;
+using CallBackVKAPI.Logger.ManagersLoggers;
 using CallBackVKAPI.Models;
 using VkNet.Abstractions;
 using VkNet.Enums;
@@ -17,9 +18,9 @@ namespace CallBackVKAPI.Controllers
             UpdateFromVK = updateFromVK;
             Configuration = configuration;
             VkApi = vkApi;
-            Logger = logger;
-            _reactionManagerLogger = new CallBackReactionManagerLogger(logger);
-            _reactionManagerLogger.LogDebugInfoAboutObject();
+            callBackReactionManagerLogger = new CallBackReactionManagerLogger(logger); //Создание логгера для класса
+            callBackReactionManagerLogger.LogObjectCreation(typeof(CallbackReactionManager)); //Логирование информации
+                                                                                              //о создании экземпляра класса
         }
 
 
@@ -39,9 +40,9 @@ namespace CallBackVKAPI.Controllers
         public IVkApi VkApi { get; private init; }
 
         /// <summary>
-        /// Используемый файловый логгер
+        /// Логгер для данного класса
         /// </summary>
-        public IFileLogger Logger { get; private init; }
+        public CallBackReactionManagerLogger callBackReactionManagerLogger { get; private set; }
 
 
         /// <summary>
@@ -51,102 +52,34 @@ namespace CallBackVKAPI.Controllers
         /// <exception cref="ArgumentNullException">Происходит, если в appsettings отсутствует аругемент Config:Confirmation</exception>
         public ICallBackReaction GetReactionOnUpdate()
         {
-            _reactionManagerLogger.LogInfoAboutQuarryOnCreatingReaction(UpdateFromVK.Type); //Логгирование пришедшего запроса
+            callBackReactionManagerLogger.LogQuarryOnManage(typeof(ICallBackReaction), UpdateFromVK.Type); //Логгирование
+                                                                                                           //пришедшего запроса
             switch (UpdateFromVK.Type)
             {
                 case "confirmation":
-                    if(Configuration["Config:Confirmation"] is null)
+                    callBackReactionManagerLogger.LogManagerChoice("confirmation"); //Логгирование выбора ветки подтверждения
+                    if (Configuration["Config:Confirmation"] is null)
                     {
-                        _reactionManagerLogger.LogConfirmationError(); //Логгирование ошибки
-                        throw new ArgumentNullException("Config:Confirmation", "Config:Confirmation - noncontains");
+                        Exception exception = new ArgumentNullException("Config:Confirmation"
+                            , "Config:Confirmation - noncontains"); //Создание ошибки
+                        callBackReactionManagerLogger.LogException(exception); //Логгирование ошибки
+                        throw exception;
                     }
-                    _reactionManagerLogger.LogConfirmationSucceed(); //Логгирование создания фабрики
-                    return (new ConfirmationCallBackReactionFactory(Logger) 
+                    return (new ConfirmationCallBackReactionFactory(callBackReactionManagerLogger.FileLogger) 
                     {
                         ResultMessage = Configuration["Config:Confirmation"]
                     }).CreateCallbackReaction();
 
                 case "message_new":
-                    _reactionManagerLogger.LogMessageNewSucceed(); //Логгирование создания фабрики
-                    return new NewMessageCallbackReactionFactory(VkApi, UpdateFromVK, Logger).CreateCallbackReaction();
+                    callBackReactionManagerLogger.LogManagerChoice("message_new"); //Логгирование выбора ветки нового сообщения
+                    return new NewMessageCallbackReactionFactory(VkApi
+                        , UpdateFromVK
+                        , callBackReactionManagerLogger.FileLogger).CreateCallbackReaction();
 
                 default:
-                    _reactionManagerLogger.LogFailedQuarryType(); //Логгирование ошибки выбора реакции
+                    callBackReactionManagerLogger.LogManagerChoice("default"); //Логгирование выбора ветки по умолчанию
                     return new FailedQueryCallbackReactionFactory().CreateCallbackReaction();
             }
         }
-
-
-        private CallBackReactionManagerLogger _reactionManagerLogger;
-    }
-
-
-    /// <summary>
-    /// Класс инкапсулирующий логику логгирования для менеджера реакций
-    /// </summary>
-    public class CallBackReactionManagerLogger
-    {
-        /// <summary>
-        /// Основной конструктор логгера для менеджера реакций
-        /// </summary>
-        /// <param name="logger">Используемый файловый логгер</param>
-        public CallBackReactionManagerLogger(IFileLogger logger)
-        {
-            _logger = logger;
-        }
-
-        /// <summary>
-        /// Метод логгирования информации о создании менеджера реакций
-        /// </summary>
-        public void LogDebugInfoAboutObject()
-        {
-            _logger.WriteStringToLog("Сформирован объект менеджера реакций", LogLevel.Debug);
-        }
-
-        /// <summary>
-        /// Логгирование информации о поступлении запроса на формирование реакции
-        /// </summary>
-        /// <param name="reactionType">Тип запроса</param>
-        public void LogInfoAboutQuarryOnCreatingReaction(string reactionType)
-        {
-            _logger.WriteStringToLog("Поступил запрос на формирование реакции, Type - " + reactionType);
-        }
-
-        /// <summary>
-        /// Метод логгирования ошибки отсутвия кода подтверждения
-        /// </summary>
-        public void LogConfirmationError()
-        {
-            _logger.WriteStringToLog("При формировании реакции на запрос произошла ошибка," +
-                " в конфигурационном файле отсутствует параметр Config:Confirmation," +
-                " отвечающий за отправляемый в ответ код подтверждения", LogLevel.Error);
-        }
-
-        /// <summary>
-        /// Метод логгирования создания фабрики реакции подтверждения
-        /// </summary>
-        public void LogConfirmationSucceed()
-        {
-            _logger.WriteStringToLog("Запрошена реакция подтверждения", LogLevel.Debug);
-        }
-
-        /// <summary>
-        /// Метод логгирования создания фабрики реакции на новое сообщение
-        /// </summary>
-        public void LogMessageNewSucceed()
-        {
-            _logger.WriteStringToLog("Запрошена реакция на новое сообщение", LogLevel.Debug);
-        }
-
-        public void LogFailedQuarryType()
-        {
-            _logger.WriteStringToLog("Запрашиваемого типа реакции не существует", LogLevel.Error);
-        }
-
-
-        /// <summary>
-        /// Используемый файловый логгер
-        /// </summary>
-        private IFileLogger _logger;
     }
 }
