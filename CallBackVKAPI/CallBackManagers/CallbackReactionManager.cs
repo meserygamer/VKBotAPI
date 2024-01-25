@@ -78,7 +78,7 @@ namespace CallBackVKAPI.Controllers
 
                 default:
                     Logger.LogManagerChoice("default"); //Логгирование выбора ветки по умолчанию
-                    return new FailedQueryCallbackReactionFactory().CreateCallbackReaction();
+                    return new FailedQueryCallbackReactionFactory(Logger.FileLogger).CreateCallbackReaction();
             }
         }
     }
