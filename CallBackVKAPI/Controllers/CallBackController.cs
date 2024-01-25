@@ -21,7 +21,6 @@ namespace CallBackVKAPI.Controllers
             Configuration = configuration;
             VkApi = vkApi;
             Logger = new (fileLogger);
-            Logger.LogObjectCreation(typeof(CallBackController));
         }
 
 
