@@ -29,7 +29,7 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
         public ICallBackReaction CreateCallbackReaction()
         {
             Logger.LogReactionCreating(typeof(FailedQueryCallbackReaction)); //Логгирование создание реакции на некорректный запрос
-            return new FailedQueryCallbackReaction();
+            return new FailedQueryCallbackReaction(Logger.FileLogger);
         }
     }
 }

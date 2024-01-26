@@ -1,4 +1,6 @@
 ﻿
+using CallBackVKAPI.Logger;
+using CallBackVKAPI.Logger.CallBackReactionLoggers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +11,19 @@ namespace CallBackVKAPI.Controllers.CallbackReactions
     /// </summary>
     public class FailedQueryCallbackReaction : CallbackReactionBase
     {
+        public FailedQueryCallbackReaction(IFileLogger logger) 
+        {
+            Logger = new FailedQueryCallbackReactionLogger(logger); //Создание логгера
+            Logger.LogObjectCreation(typeof(FailedQueryCallbackReaction)); //Логгирование создания объекта
+        }
+
+
+        /// <summary>
+        /// Логгер для данного класса
+        /// </summary>
+        public FailedQueryCallbackReactionLogger Logger { get; private set; }
+
+
         /// <summary>
         /// Метод, возвращающий результат реакции
         /// </summary>
