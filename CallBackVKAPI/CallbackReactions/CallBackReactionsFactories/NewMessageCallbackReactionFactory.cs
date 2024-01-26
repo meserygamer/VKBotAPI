@@ -56,7 +56,7 @@ namespace CallBackVKAPI.Controllers.CallBackReactionsFactories
         {
             IBotCommand botCommand = CreateBotCommand();
             Logger.LogReactionCreating(typeof(NewMessageCallbackReaction)); //Логгирование создания реакции нового сообщения
-            return new NewMessageCallbackReaction(botCommand);
+            return new NewMessageCallbackReaction(botCommand, Logger.FileLogger);
         }
 
 
