@@ -46,7 +46,10 @@ namespace CallBackVKAPI.Controllers
             {
                 default:
                     Logger.LogManagerChoice("default"); //Логгирование выбора стандартной ветки
-                    return new ShowMenuBotCommandFactory(VkApi, MessageFromUser).CreateBotCommand();
+                    return new ShowMenuBotCommandFactory(VkApi
+                        , MessageFromUser
+                        , Logger.FileLogger)
+                        .CreateBotCommand();
             }
         }
     }
