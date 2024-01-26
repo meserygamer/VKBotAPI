@@ -1,4 +1,6 @@
 ﻿using CallBackVKAPI.Logger;
+using CallBackVKAPI.Logger.CallBackReactionFactoriesLoggers;
+using CallBackVKAPI.Logger.CallBackReactionLoggers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CallBackVKAPI.Controllers.CallbackReactions
@@ -11,9 +13,15 @@ namespace CallBackVKAPI.Controllers.CallbackReactions
         public ConfirmationCallbackReaction(string confirmingMessage, IFileLogger logger)
         {
             ConfirmingMessage = confirmingMessage;
-            _confirmationCallbackReactionLogger = new ConfirmationCallbackReactionLogger(logger);
-            _confirmationCallbackReactionLogger.LogInfoAboutCreatingObject();
+            Logger = new ConfirmationCallbackReactionLogger(logger);
+            Logger.LogObjectCreation(typeof(ConfirmationCallbackReaction)); //Логирование создания объекта
         }
+
+
+        /// <summary>
+        /// Логгер для данного класса
+        /// </summary>
+        public ConfirmationCallbackReactionLogger Logger { get; private set; }
 
 
         /// <summary>
@@ -38,32 +46,5 @@ namespace CallBackVKAPI.Controllers.CallbackReactions
         /// Сообщение для подтвержения сервера
         /// </summary>
         public string ConfirmingMessage { get; private set; } = "";
-
-
-        private ConfirmationCallbackReactionLogger _confirmationCallbackReactionLogger;
-    }
-
-
-    public class ConfirmationCallbackReactionLogger
-    {
-        public ConfirmationCallbackReactionLogger(IFileLogger logger)
-        {
-            _logger = logger;
-        }
-
-
-        /// <summary>
-        /// Метод логгирования информации о создании нового объекта
-        /// </summary>
-        public void LogInfoAboutCreatingObject()
-        {
-            _logger.WriteStringToLog("Создан объект реакции подтверждения", LogLevel.Debug);
-        }
-
-
-        /// <summary>
-        /// Используемый файловый логгер
-        /// </summary>
-        private IFileLogger _logger;
     }
 }
