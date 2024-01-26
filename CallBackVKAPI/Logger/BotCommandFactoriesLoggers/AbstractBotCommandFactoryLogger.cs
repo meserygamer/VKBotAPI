@@ -3,9 +3,9 @@
     /// <summary>
     /// Класс инкапсулирующий общую логику логгирования для фабрик создания комманд бота
     /// </summary>
-    public class BotCommandFactoryLogger : ApiObjectLogger
+    public abstract class BotCommandFactoryLogger : ApiObjectLogger
     {
-        public BotCommandFactoryLogger(IFileLogger logger) : base(logger)
+        protected BotCommandFactoryLogger(IFileLogger logger) : base(logger)
         {
         }
 

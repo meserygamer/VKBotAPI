@@ -1,4 +1,7 @@
-﻿using CallBackVKAPI.Models;
+﻿using CallBackVKAPI.Logger;
+using CallBackVKAPI.Logger.BotCommandLoggers;
+using CallBackVKAPI.Logger.ManagersLoggers;
+using CallBackVKAPI.Models;
 using VkNet.Abstractions;
 using VkNet.Model;
 
@@ -9,28 +12,40 @@ namespace CallBackVKAPI.Controllers.BotCommands
     /// </summary>
     public class ShowMenuBotCommand : IBotCommand
     {
-        public ShowMenuBotCommand(IVkApi vkApi, MessagesSendParams messageParams)
+        public ShowMenuBotCommand(IVkApi vkApi, MessagesSendParams messageParams, IFileLogger logger)
         {
-            _vkApi = vkApi;
+            VkApi = vkApi;
             MessageParams = messageParams;
+            Logger = new ShowMenuBotCommandLogger(logger); //Создание логгера
+            Logger.LogObjectCreation(typeof(ShowMenuBotCommand)); //Логгирование создания объекта
         }
 
 
         /// <summary>
         /// Свойство, хранящее параметры сообщения
         /// </summary>
-        public MessagesSendParams MessageParams { get; set; }
+        public MessagesSendParams MessageParams { get; private init; }
+
+        /// <summary>
+        /// Экземпляр VK API
+        /// </summary>
+        public IVkApi VkApi { get; private init; }
+
+        /// <summary>
+        /// Логгер для данного класса
+        /// </summary>
+        public ShowMenuBotCommandLogger Logger { get; private set; }
 
 
         /// <summary>
         /// Метод, отправляющий меню
         /// </summary>
-        public void ExecuteCommand() => _vkApi.Messages.SendAsync(MessageParams);
-
-
-        /// <summary>
-        /// Экземпляр VK api, через который происходит отправка меню
-        /// </summary>
-        private IVkApi _vkApi;
+        public void ExecuteCommand()
+        {
+            Logger.LogStartCommandExecution(typeof(ShowMenuBotCommand)); //Логгирование
+                                                                         //запуска комманды
+                                                                         //на исполнение
+            VkApi.Messages.SendAsync(MessageParams);
+        }
     }
 }

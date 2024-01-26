@@ -60,7 +60,8 @@ namespace CallBackVKAPI.Controllers.BotCommandsFactories
                 , new ShowMainMenuMessageParamsBuilder((long)Message.FromId)
                     .AddContent()
                     .AddKeyboard()
-                    .Build());
+                    .Build()
+                , Logger.FileLogger);
         }
     }
 }
